@@ -2,54 +2,54 @@ import { supabase } from './supabase.js';
 
 const container = document.querySelector(".coiffeur-list");
 
+function getOptimizedImage(url) {
+  return url?.includes("supabase.co")
+    ? `${url}?width=150&quality=70&format=webp`
+    : "picture/default.jpg";
+}
+
+function preloadImage(url) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.src = url;
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+  });
+}
+
 async function chargerCoiffeurs() {
   const { data, error } = await supabase
     .from("coiffeurs")
     .select("id, nom, prenom, photo_url, description");
 
   if (error) {
-    console.error("Erreur chargement coiffeurs :", error);
-    container.innerHTML = "<p>Erreur de chargement des coiffeurs.</p>";
+    container.innerHTML = "<p>Erreur de chargement.</p>";
     return;
   }
 
-  container.innerHTML = ""; // Vide les coiffeurs codés en dur
+  container.innerHTML = "";
 
-  data.forEach(coiffeur => {
-    const div = document.createElement("div");
-    div.classList.add("coiffeur-card");
+  for (const { id, nom, prenom, photo_url, description } of data) {
+    const imgUrl = getOptimizedImage(photo_url);
+    const imgElement = await preloadImage(imgUrl);
 
-    const img = document.createElement("img");
-    img.src = coiffeur.photo_url || "picture/default.jpg";
-    img.alt = coiffeur.prenom;
-    img.loading = "lazy";
-    img.addEventListener("load", () => img.classList.add("loaded"));
+    const card = document.createElement("div");
+    card.className = "coiffeur-card";
 
-    const h3 = document.createElement("h3");
-    h3.textContent = `${coiffeur.prenom} ${coiffeur.nom}`;
+    card.innerHTML = `
+      <img src="${imgElement?.src || 'picture/default.jpg'}" alt="${prenom}" width="120" height="120" />
+      <h3>${prenom} ${nom}</h3>
+      <p>${description || "Aucune description"}</p>
+      <button data-id="${id}">Choisir</button>
+    `;
 
-    const p = document.createElement("p");
-    p.textContent = coiffeur.description || "Aucune description";
-
-    const button = document.createElement("button");
-    button.textContent = "Choisir";
-    button.setAttribute("data-id", coiffeur.id);
-
-    button.addEventListener("click", () => {
-      localStorage.setItem("selectedCoiffeurId", coiffeur.id);
+    card.querySelector("button").addEventListener("click", () => {
+      localStorage.setItem("selectedCoiffeurId", id);
       window.location.href = "reservation.html";
     });
 
-    div.appendChild(img);
-    div.appendChild(h3);
-    div.appendChild(p);
-    div.appendChild(button);
-
-    container.appendChild(div);
-  });
+    container.appendChild(card);
+  }
 }
 
-// ✅ Appelle la fonction une fois le DOM prêt
-document.addEventListener("DOMContentLoaded", () => {
-  chargerCoiffeurs();
-});
+document.addEventListener("DOMContentLoaded", chargerCoiffeurs);
