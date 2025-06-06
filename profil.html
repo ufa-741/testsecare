@@ -11,8 +11,8 @@
 
   <header>
     <a href="index.html">
-    <img src="picture/logoof.jpg" alt="Logo SECARE" class="logo">
-
+      <img src="picture/logoof.jpg" alt="Logo SECARE" class="logo">
+    </a>
   </header>
 
   <main class="profile-container">
@@ -21,7 +21,8 @@
       <h2>Créer mon profil</h2>
     </div>
 
-    <form class="profile-form">
+    <!-- ✅ Form remplacé par simple div -->
+    <div class="profile-form">
       <label for="prenom">Prénom</label>
       <input type="text" id="prenom" />
 
@@ -34,8 +35,8 @@
       <label for="photo">Photo de profil (URL ou fichier)</label>
       <input type="file" id="photo" accept="image/*" />
 
-      <button type="submit" id="valider-profil">Enregistrer mon profil</button>
-    </form>
+      <button id="valider-profil">Enregistrer mon profil</button>
+    </div>
   </main>
 
   <script type="module" src="profil.js"></script>

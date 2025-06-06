@@ -101,7 +101,14 @@ function updateCalendar() {
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
   const startDay = firstDay.getDay();
-  monthYear.textContent = `${mois[month]} ${year}`;
+  const today = new Date();
+  const isSameMonth = today.getMonth() === month && today.getFullYear() === year;
+  const dayText = isSameMonth ? ` - ${jours[today.getDay()]} ${today.getDate()}` : '';
+  monthYear.textContent = `${dayText} ${mois[month]} ${year}`;
+
+  
+
+
 
   const totalCells = startDay + lastDay.getDate();
   for (let i = 0; i < totalCells; i++) {
@@ -119,7 +126,13 @@ function updateCalendar() {
     const jourNom = jours[dateObj.getDay()];
     const dateText = `${jourNom} ${dayNum} ${mois[month]}`;
 
-    li.innerHTML = `<time datetime="${key}">${dayNum}</time>`;
+    li.innerHTML = `
+    <div class="day-cell">
+    <div class="day-name">${jourNom}</div>
+    <time datetime="${key}" class="day-number">${dayNum}</time>
+    </div>
+    `;
+
 
     if (reservationsSupabase[key]) {
       li.classList.add("booked");
